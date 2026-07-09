@@ -1,0 +1,40 @@
+#! /usr/bin/env python
+# -*- coding:utf-8 -*-
+"""
+@Time    : 2026/7/715:10
+@Author  :shlongqishi@gmail.com
+@File    :2.Model批处理.py
+"""
+# ! /usr/bin/env python
+# -*- coding:utf-8 -*-
+"""
+@Time    : 2026/7/714:46
+@Author  :shlongqishi@gmail.com
+@File    :1.LLM与ChatModel使用技巧.py
+"""
+from datetime import datetime
+
+import dotenv
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+dotenv.load_dotenv()
+
+# 1.编排prompt
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "你是OpenAI开发的聊天机器人，请回答用户的额问题，现在的时间是{now}"),
+    ("human", "{query}"),
+]).partial(now=datetime.now())
+
+# 2.创建大语言模型
+llm = ChatOpenAI(model="deepseek-v4-flash")
+
+ai_messages = llm.batch([
+    prompt.invoke({"query": "你好，你是？"}),  # 相比system、human，batch上下文，只是通过接口传输？
+    prompt.invoke({"query": "请讲一个关于程序员的冷笑话"}),
+])
+
+for ai_message in ai_messages:
+    print(ai_message.content)
+    print(ai_message.response_metadata)
+    print("-----------------")
